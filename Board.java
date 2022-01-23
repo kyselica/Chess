@@ -1,4 +1,5 @@
-package chess;
+import java.security.spec.ECFieldF2m;
+
 public class Board {
     public final static int BOARD_SIZE = 8;
     
@@ -29,6 +30,118 @@ public class Board {
         
     }
 
+    // will return boolean if the square is attacked by a piece of the same color as inputted
+    public boolean isAttacked(int x, int y, int color) {
+        //get next piece above the cords
+        int searchx;
+        int searchy;
+        Piece piece = null;
+        for (int i = 0; i < 8; i++) {
+            searchx = x;
+            searchy = y;
+            if (i==0) {
+                searchx = x + 1; // will check above
+            } else if (i == 1) {
+                searchx = x - 1; //checks below
+            }  else if (i == 2) {
+                searchy = y + 1; //checks right
+            } else if (i==3) {
+                searchy = y - 1; //checks left
+            } else if (i==4) {
+                searchy = y + 1; //checls up right diag
+                searchx = x + 1;
+            } else if (i==5) {
+                searchy = y + 1; //checks down right diag
+                searchx = x - 1;
+            } else if (i==6) {
+                searchy = y - 1; //checks up left diag
+                searchx = x + 1;
+            } else if (i==7) {
+                searchy = y - 1; //checks down left diag
+                searchx = x - 1;
+            }
+
+            //gets a piece in each direction
+            while (searchx < BOARD_SIZE && searchx > 0 && searchy > 0 && searchy < BOARD_SIZE) {
+                if (hasPiece(searchx, searchy)) {
+                    piece = getPos(searchx, searchy);
+                    break;
+                }
+
+                //progress all the checks in the direction they need to go
+                if (searchx - x > 0) {
+                    searchx++;
+                } else if (searchx - x < 0) {
+                    searchx--;
+                }
+                if (searchy - y > 0) {
+                    searchy++;
+                } else if (searchy - y < 0) {
+                    searchy--;
+                }
+            }
+
+            //checks if a unblocked correctly colored rook or queen is on the horizontal
+            if (piece != null && piece.getColor() == color) {
+                if (i <= 3 && (piece.getType().equals("Rook") || piece.getType().equals("Queen"))) {
+                    return true;
+                } else if (i > 3 && i <= 7 && (piece.getType().equals("Bishop") || piece.getType().equals("Queen"))) { //this checks if there is a correctly colored bishop or queen on the diag
+                    return true;
+                }
+            }
+        }
+
+        //now we have to check if there is a pawn, knight, or king covering those squares.
+
+        //check if there is a knight at an attacking square
+        for (searchx = x + 2; searchx >= 1; searchx--) {
+            for (searchy = y + 1; searchy <=2; searchy++) {
+                for (int i = 0; i < 4; i++) {
+                    if (i==1) {
+                        searchx = -searchx;
+                    } else if (i == 2) {
+                        searchy = -searchy;
+                    } else if (i==3) {
+                        searchx = -searchx;
+                        searchy = -searchy;
+                    }
+                    if (hasPiece(searchx, searchy) && getPos(searchx, searchy).getType().equals("Knight") && getPos(searchx, searchy).getColor() == color) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        //check if there is a pawn in an attacking square. Have to take into account that different oclored pawns attack in different directions
+        if (color == 1) {
+            if (hasPiece(x-1, y+1) && getPos(x-1, y+1).getType().equals("Pawn") && getPos(x-1, y+1).getColor() == 1) {
+                return true;
+            } else if (hasPiece(x-1, y-1) && getPos(x-1, y-1).getType().equals("Pawn") && getPos(x-1, y-1).getColor() == 1) {
+                return true;
+            }
+        } else if (color == 0) {
+            if (hasPiece(x+1, y+1) && getPos(x+1, y+1).getType().equals("Pawn") && getPos(x+1, y+1).getColor() == 0) {
+                return true;
+            } else if (hasPiece(x+1, y-1) && getPos(x+1, y-1).getType().equals("Pawn") && getPos(x+1, y-1).getColor() == 0) {
+                return true;
+            }
+        }
+
+        //finally, check if a king is attacking the square
+        for (searchx = -1; searchx <=1; searchx++) {
+            for (searchy = -1; searchy <= 1; searchy++) {
+                //make sure the king isnt on the square
+                if (searchx != x && searchy != y) {
+                    if (hasPiece(searchx, searchy) && getPos(searchx, searchy).getType().equals("King") && getPos(searchx, searchy).getColor() == color){
+                        return true;
+                    } 
+                }
+            }
+        }
+        //if none of those return true triggers, then the square is not attacked.
+        return false;
+    }
+
     public Piece[][] getBoard() {
         return board;
     }
@@ -38,6 +151,7 @@ public class Board {
     }
 
     public void setPiece(int x, int y, Piece p) {
+        System.out.println(x + " " + y);
         board[x][y] = p;
         p.setX(x);
         p.setY(y);
@@ -47,8 +161,57 @@ public class Board {
         return board[x][y];
     }
 
+    // will return true if the square the king of color is on is attacked by the opposite color
+    public boolean isChecked(int color) {
+        for (int x = 0; x < BOARD_SIZE; x++) {
+            for (int y = 0; y < BOARD_SIZE; y++) {
+                if (hasPiece(x, y) && getPos(x, y).getType().equals("King") && getPos(x, y).getColor() == color) {
+                    return isAttacked(x, y, 1 - color);
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean hasPiece(int x, int y) {
-        return board[x][y] != null;
+        if (x < BOARD_SIZE && x >= 0 && y < BOARD_SIZE && y >=0 ) {
+            return board[x][y] != null;
+        }
+        return false;
+    }
+
+    public void movePiece(int x, int y, int targetx, int targety) {
+        System.out.println(x + " " + y + " " + targetx + " " + targety);
+        setPiece(targetx, targety, getPos(x, y));
+        delPiece(x,y);
+    }
+
+    public void setEqual(Piece[][] x, Piece[][] y) {
+        for (int i =0; i < BOARD_SIZE;i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                x[i][j] = y[i][j];
+            }
+        }
+    }
+
+    public boolean legalMove(int x, int y, int targetx, int targety, int turn) {
+        Piece[][] testBoard = new Piece[BOARD_SIZE][BOARD_SIZE];
+        setEqual(testBoard, board);
+
+        //if the piece can move, move it...
+        if (canMove(x, y, targetx, targety, turn)) {
+            movePiece(x, y, targetx, targety);
+        }
+        //but if that move left your king in check, then return false
+        if (isChecked(turn)) {
+            setEqual(board, testBoard);
+            return false;
+        }
+        if (board == testBoard) {
+            System.out.println("Crap");
+        }
+        setEqual(board, testBoard); // make sure we return board to previous state before moving on
+        return true;
     }
 
     //splits all the move checks into smaller comprehensible parts
@@ -227,7 +390,6 @@ public class Board {
         || (y - 2 == targety && (x+1 == targetx || x-1 == targetx))) {
             //if the landing square has nothing or an enemy piece, it can move there
             if ((hasPiece(targetx, targety) && getPos(targetx, targety).getColor() != getPos(x,y).getColor()) || !hasPiece(targetx, targety)) {
-                System.out.println("NEIGHHH");
                 return true;
             }
         }

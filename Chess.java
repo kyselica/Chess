@@ -1,4 +1,3 @@
-package chess;
 import java.util.*;
 
 public class Chess {
@@ -22,7 +21,7 @@ public class Chess {
         return output;
     }
 
-    public static void main(String[] args) {
+    public static void main (String[] args) {
         Board game = new Board();
         boolean gamegoing = true;
         int[] movepiecefrom;
@@ -36,12 +35,12 @@ public class Chess {
             System.out.println("Enter cords of where you would like to move it.");
             movepieceto = getCords();
 
-            if (game.canMove(movepiecefrom[0], movepiecefrom[1], movepieceto[0], movepieceto[1], turn)) {
-                game.setPiece(movepieceto[0], movepieceto[1], game.getPos(movepiecefrom[0], movepiecefrom[1]));
-                game.delPiece(movepiecefrom[0],movepiecefrom[1]);
+            if (game.legalMove(movepiecefrom[0], movepiecefrom[1], movepieceto[0], movepieceto[1], turn)) {
+                game.movePiece(movepiecefrom[0], movepiecefrom[1], movepieceto[0], movepieceto[1]);
+                System.out.println("White in check? " + game.isChecked(1));
                 turn = 1-turn;
             } else {
-                System.out.println("Please enter a valid move.");
+                System.out.println("That move is not legal.");
             }
         }
 

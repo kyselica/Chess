@@ -1,5 +1,3 @@
-package chess;
-
 public class Piece {
     private int x;
     private int y;
