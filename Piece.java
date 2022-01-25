@@ -1,6 +1,6 @@
 public class Piece {
-    private int x;
-    private int y;
+    private int x = -1;
+    private int y = -1;
     private int color;
 
     public Piece(int color) {
@@ -29,5 +29,9 @@ public class Piece {
 
     public String getType() {
         return "Unset Piece";
+    }
+
+    public boolean canMove(Board board, int targetx, int targety) {
+        return false;
     }
 }

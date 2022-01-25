@@ -9,7 +9,7 @@ public class Chess {
 
         while (true) {
             try {
-                a = input.nextLine();
+                a = input.nextLine().toUpperCase();
                 output[1] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(a.charAt(0));
                 output[0] = Integer.parseInt((a.charAt(1) + "").toUpperCase()) - 1;
 
