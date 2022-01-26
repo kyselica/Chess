@@ -14,6 +14,13 @@ public class Queen extends Piece {
         return type;
     }
 
+    public Queen makeCopy() {
+        Queen output = new Queen(getColor());
+        output.setX(getX());
+        output.setY(getY());
+        return output;
+    }
+
     public boolean canMove(Board board, int targetx, int targety) {
         int x = getX();
         int y = getY();

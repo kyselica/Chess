@@ -34,4 +34,11 @@ public class Piece {
     public boolean canMove(Board board, int targetx, int targety) {
         return false;
     }
+
+    public Piece makeCopy() {
+        Piece output = new Piece(getColor());
+        output.setX(getX());
+        output.setY(getY());
+        return output;
+    }
 }

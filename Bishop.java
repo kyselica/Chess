@@ -67,4 +67,11 @@ public class Bishop extends Piece {
         }
         return false;
     }
+
+    public Bishop makeCopy() {
+        Bishop output = new Bishop(getColor());
+        output.setX(getX());
+        output.setY(getY());
+        return output;
+    }
 }

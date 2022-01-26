@@ -14,6 +14,13 @@ public class Knight extends Piece {
         return type;
     }
 
+    public Knight makeCopy() {
+        Knight output = new Knight(getColor());
+        output.setX(getX());
+        output.setY(getY());
+        return output;
+    }
+
     public boolean canMove(Board board, int targetx, int targety) {
         //if the move follows how a knight can move
         if ((getX() + 2 == targetx && (getY()+1 == targety || getY()-1 == targety))

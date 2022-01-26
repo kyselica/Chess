@@ -5,27 +5,44 @@ public class Board {
 
     public Board() {
 
+    }
+
+    public void setup() {
         //fill the board up with pieces
         for (int i=0; i < 2; i ++) {
-            setPiece(i*7, 0, new Rook(1-i));
-            setPiece(i*7, 1, new Knight(1-i));
-            setPiece(i*7, 2, new Bishop(1-i));
-            setPiece(i*7, 3, new King(1-i));
-            setPiece(i*7, 4, new Queen(1-i));
-            setPiece(i*7, 5, new Bishop(1-i));
-            setPiece(i*7, 6, new Knight(1-i));
-            setPiece(i*7, 7, new Rook(1-i));
+            setPiece(i*7, 0, new Rook(i));
+            setPiece(i*7, 1, new Knight(i));
+            setPiece(i*7, 2, new Bishop(i));
+            setPiece(i*7, 4, new King(i));
+            setPiece(i*7, 3, new Queen(i));
+            setPiece(i*7, 5, new Bishop(i));
+            setPiece(i*7, 6, new Knight(i));
+            setPiece(i*7, 7, new Rook(i));
         }
         
         for (int i=0; i < BOARD_SIZE; i ++) {
-            setPiece(1,i,new Pawn(1));
+            setPiece(1,i,new Pawn(0));
         }
         for (int i=0; i < BOARD_SIZE; i ++) {
-            setPiece(6,i,new Pawn(0));
+            setPiece(6,i,new Pawn(1));
         }
+    }
 
-
-        
+    public boolean hasLegalMoves(int turn) {
+        for (int a = 0; a < BOARD_SIZE; a++) {
+            for (int b = 0; b < BOARD_SIZE; b++) {
+                if (hasPiece(a, b) && getPos(a,b).getColor() == turn) {
+                    for (int x=0; x < BOARD_SIZE; x++) {
+                        for (int y=0; y < BOARD_SIZE; y++) {
+                            if (legalMove(a, b, x, y, turn)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     // will return boolean if the square is attacked by a piece of the same color as inputted
@@ -37,6 +54,7 @@ public class Board {
         for (int i = 0; i < 8; i++) {
             searchx = x;
             searchy = y;
+            piece = null;
             if (i==0) {
                 searchx = x + 1; // will check above
             } else if (i == 1) {
@@ -46,7 +64,7 @@ public class Board {
             } else if (i==3) {
                 searchy = y - 1; //checks left
             } else if (i==4) {
-                searchy = y + 1; //checls up right diag
+                searchy = y + 1; //checks up right diag
                 searchx = x + 1;
             } else if (i==5) {
                 searchy = y + 1; //checks down right diag
@@ -58,9 +76,14 @@ public class Board {
                 searchy = y - 1; //checks down left diag
                 searchx = x - 1;
             }
+            
 
             //gets a piece in each direction
-            while (searchx < BOARD_SIZE && searchx > 0 && searchy > 0 && searchy < BOARD_SIZE) {
+            while (searchx < BOARD_SIZE && searchx >= 0 && searchy >= 0 && searchy < BOARD_SIZE) {
+
+                if (searchx == 6 && searchy == 6) {
+ 
+                }
                 if (hasPiece(searchx, searchy)) {
                     piece = getPos(searchx, searchy);
                     break;
@@ -83,7 +106,7 @@ public class Board {
             if (piece != null && piece.getColor() == color) {
                 if (i <= 3 && (piece.getType().equals("Rook") || piece.getType().equals("Queen"))) {
                     return true;
-                } else if (i > 3 && i <= 7 && (piece.getType().equals("Bishop") || piece.getType().equals("Queen"))) { //this checks if there is a correctly colored bishop or queen on the diag
+                } else if (i > 3 && (piece.getType().equals("Bishop") || piece.getType().equals("Queen"))) { //this checks if there is a correctly colored bishop or queen on the diag
                     return true;
                 }
             }
@@ -104,7 +127,7 @@ public class Board {
                         searchy = -searchy;
                     }
                     if (hasPiece(searchx, searchy) && getPos(searchx, searchy).getType().equals("Knight") && getPos(searchx, searchy).getColor() == color) {
-                        return true;
+                        //return true;
                     }
                 }
             }
@@ -113,15 +136,15 @@ public class Board {
         //check if there is a pawn in an attacking square. Have to take into account that different oclored pawns attack in different directions
         if (color == 1) {
             if (hasPiece(x-1, y+1) && getPos(x-1, y+1).getType().equals("Pawn") && getPos(x-1, y+1).getColor() == 1) {
-                return true;
+                //return true;
             } else if (hasPiece(x-1, y-1) && getPos(x-1, y-1).getType().equals("Pawn") && getPos(x-1, y-1).getColor() == 1) {
-                return true;
+                //return true;
             }
         } else if (color == 0) {
             if (hasPiece(x+1, y+1) && getPos(x+1, y+1).getType().equals("Pawn") && getPos(x+1, y+1).getColor() == 0) {
-                return true;
+                //return true;
             } else if (hasPiece(x+1, y-1) && getPos(x+1, y-1).getType().equals("Pawn") && getPos(x+1, y-1).getColor() == 0) {
-                return true;
+                //return true;
             }
         }
 
@@ -131,7 +154,7 @@ public class Board {
                 //make sure the king isnt on the square
                 if (searchx != x && searchy != y) {
                     if (hasPiece(searchx, searchy) && getPos(searchx, searchy).getType().equals("King") && getPos(searchx, searchy).getColor() == color){
-                        return true;
+                        //return true;
                     } 
                 }
             }
@@ -170,6 +193,17 @@ public class Board {
         return false;
     }
 
+    public void printAttackedSquares(int color) {
+        for (int x = 0; x < BOARD_SIZE;x++) {
+            
+            for (int y = 0; y < BOARD_SIZE; y++) {
+                //System.out.print(((isAttacked( 8-x, y, color)) ? "" : ""));
+                System.out.print(((isAttacked(x, y, color)) ? "X " : "- "));
+            }
+            System.out.println();
+        }
+    }
+
     public boolean hasPiece(int x, int y) {
         if (x < BOARD_SIZE && x >= 0 && y < BOARD_SIZE && y >=0 ) {
             return board[x][y] != null;
@@ -185,7 +219,12 @@ public class Board {
     public void setEqual(Piece[][] x, Piece[][] y) {
         for (int i =0; i < BOARD_SIZE;i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                x[i][j] = y[i][j];
+                if (y[i][j] != null) {
+                    x[i][j] = y[i][j].makeCopy();
+                } else {
+                    x[i][j] = null;
+                }
+                
             }
         }
     }
@@ -193,9 +232,8 @@ public class Board {
 
 
     public boolean legalMove(int x, int y, int targetx, int targety, int turn) {
-        Piece[][] testBoard = new Piece[BOARD_SIZE][BOARD_SIZE];
-        setEqual(testBoard, board);
-
+        Piece[][] testboard=  new Piece[BOARD_SIZE][BOARD_SIZE];
+        setEqual(testboard, board);
         //if the piece can move, move it...
         if (canMove(x, y, targetx, targety, turn)) {
             movePiece(x, y, targetx, targety);
@@ -204,10 +242,12 @@ public class Board {
         }
         //but if that move left your king in check, then return false
         if (isChecked(turn)) {
-            setEqual(board, testBoard);
+            setEqual(board, testboard);
+            //movePiece(targetx,targety, x, y); //move the piece back before returning.
             return false;
         }
-        setEqual(board, testBoard); // make sure we return board to previous state before moving on
+        setEqual(board, testboard);
+        //movePiece(targetx,targety, x, y);
         return true;
     }
 
@@ -231,9 +271,9 @@ public class Board {
         
 
         //prints the pieces on board using their toString methods
-        for (int i = BOARD_SIZE-1; i >= 0; i--) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
 
-            output += (i+1) + " ";
+            output += (8-i) + " ";
 
             for (int j = 0; j < BOARD_SIZE; j++) {
                 //if there is no piece, add " - "

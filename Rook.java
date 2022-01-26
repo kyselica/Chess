@@ -15,6 +15,13 @@ public class Rook extends Piece {
         return type;
     }
 
+    public Rook makeCopy() {
+        Rook output = new Rook(getColor());
+        output.setX(getX());
+        output.setY(getY());
+        return output;
+    }
+
     public boolean canMove(Board board, int targetx, int targety) {
         int x = getX();
         int y = getY();
