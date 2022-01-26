@@ -4,7 +4,6 @@ public class Board {
     private Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
 
     public Board() {
-
     }
 
     public void setup() {
@@ -115,36 +114,58 @@ public class Board {
         //now we have to check if there is a pawn, knight, or king covering those squares.
 
         //check if there is a knight at an attacking square
-        for (searchx = x + 2; searchx >= 1; searchx--) {
-            for (searchy = y + 1; searchy <=2; searchy++) {
-                for (int i = 0; i < 4; i++) {
-                    if (i==1) {
-                        searchx = -searchx;
-                    } else if (i == 2) {
-                        searchy = -searchy;
-                    } else if (i==3) {
-                        searchx = -searchx;
-                        searchy = -searchy;
-                    }
-                    if (hasPiece(searchx, searchy) && getPos(searchx, searchy).getType().equals("Knight") && getPos(searchx, searchy).getColor() == color) {
-                        //return true;
-                    }
+        searchx = -1;
+        searchy = -1;
+        int b = 1;
+        for (int a = 2; a >= 1; a--) {
+            for (int i = 0; i < 4; i++) {
+                searchx = a;
+                searchy = b;
+                if (i==1) {
+                    searchx = -a;
+                } else if (i == 2) {
+                    searchy = -b;
+                } else if (i==3) {
+                    searchx = -a;
+                    searchy = -b;
+                }
+                if (hasPiece(searchx + x, searchy + y) && getPos(searchx + x, searchy + y).getType().equals("Knight") && getPos(searchx + x, searchy + y).getColor() == color) {
+                    return true;
                 }
             }
+            b++;
         }
-
+        /*
+        if (hasPiece(x + 2, y + 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        } else if (hasPiece(x + 2, y - 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        } else if (hasPiece(x - 2, y + 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        } else if (hasPiece(x - 2, y - 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        } else if (hasPiece(x + 1, y + 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        } else if (hasPiece(x + 1, y - 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        } else if (hasPiece(x - 1, y + 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        } else if (hasPiece(x - 1, y - 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
+            return true;
+        }
+*/
         //check if there is a pawn in an attacking square. Have to take into account that different oclored pawns attack in different directions
         if (color == 1) {
             if (hasPiece(x-1, y+1) && getPos(x-1, y+1).getType().equals("Pawn") && getPos(x-1, y+1).getColor() == 1) {
-                //return true;
+                return true;
             } else if (hasPiece(x-1, y-1) && getPos(x-1, y-1).getType().equals("Pawn") && getPos(x-1, y-1).getColor() == 1) {
-                //return true;
+                return true;
             }
         } else if (color == 0) {
             if (hasPiece(x+1, y+1) && getPos(x+1, y+1).getType().equals("Pawn") && getPos(x+1, y+1).getColor() == 0) {
-                //return true;
+                return true;
             } else if (hasPiece(x+1, y-1) && getPos(x+1, y-1).getType().equals("Pawn") && getPos(x+1, y-1).getColor() == 0) {
-                //return true;
+                return true;
             }
         }
 
@@ -154,7 +175,7 @@ public class Board {
                 //make sure the king isnt on the square
                 if (searchx != x && searchy != y) {
                     if (hasPiece(searchx, searchy) && getPos(searchx, searchy).getType().equals("King") && getPos(searchx, searchy).getColor() == color){
-                        //return true;
+                        return true;
                     } 
                 }
             }
@@ -211,8 +232,39 @@ public class Board {
         return false;
     }
 
+    public boolean castleQueenside(int color) {
+        for (int i = 1; i < 4; i++) {
+            if (hasPiece(color*7, i) || isAttacked(color*7, i, 1-color)) {
+                return false;
+            }
+        }
+        if (hasPiece(color*7, 0) && getPos(color*7, 0).getType().equals("Rook") && !getPos(color*7, 0).hasMoved() ||
+                hasPiece(color*7, 4) && getPos(color*7, 4).getType().equals("King") && !getPos(color*7, 4).hasMoved()) {
+                    movePiece(color*7, 4, color*7, 2);
+                    movePiece(color*7, 0, color*7, 3);
+                    return true;
+        }
+        return false;
+    }
+
+    public boolean castleKingside(int color) {
+        for (int i = 5; i < 7; i++) {
+            if (hasPiece(color*7, i) || isAttacked(color*7, i, 1-color)) {
+                return false;
+            }
+        }
+        if (hasPiece(color*7, 7) && getPos(color*7, 7).getType().equals("Rook") && !getPos(color*7, 7).hasMoved() ||
+                hasPiece(color*7, 4) && getPos(color*7, 4).getType().equals("King") && !getPos(color*7, 4).hasMoved()) {
+                    movePiece(color*7, 4, color*7, 6);
+                    movePiece(color*7, 7, color*7, 5);
+                    return true;
+        }
+        return false;
+    }
+
     public void movePiece(int x, int y, int targetx, int targety) {
         setPiece(targetx, targety, getPos(x, y));
+        getPos(x, y).setMoved(true);
         delPiece(x,y);
     }
 

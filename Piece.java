@@ -2,6 +2,7 @@ public class Piece {
     private int x = -1;
     private int y = -1;
     private int color;
+    private boolean hasMoved = false;
 
     public Piece(int color) {
         this.color = color;
@@ -15,6 +16,10 @@ public class Piece {
         this.x = x;
     }
 
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
     public void setY(int y){
         this.y = y;
     }
@@ -25,6 +30,10 @@ public class Piece {
 
     public int getY() {
         return y;
+    }
+
+    public void setMoved(boolean x) {
+        hasMoved = x;
     }
 
     public String getType() {
