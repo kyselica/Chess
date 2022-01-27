@@ -366,7 +366,7 @@ public class Board {
         //prints the numbers across top
         output += "  ";
         for (int i = 0; i < BOARD_SIZE; i++) {
-            output += " " + "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(i) + " "; //add letters on side
+            output += " " + "abcdefghijklmnopqrstuvwxyz".charAt(i) + " "; //add letters on side
         }
         output += "\n";
 

@@ -127,7 +127,7 @@ public class Chess {
         while (gamegoing) {
             
             System.out.println(game);
-            System.out.println(((turn == 1) ? "White" : "Black") + "\'s Turn! Enter cords of piece you want to move. (O-O or O-O-O to castle)");
+            System.out.println(((turn == 1) ? "White" : "Black") + "\'s Turn! Enter your move. (Use chess algebraic notation");
             output = getMove(game, turn);
 
 
