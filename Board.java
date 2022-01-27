@@ -1,8 +1,9 @@
+import java.util.*;
 public class Board {
     public final static int BOARD_SIZE = 8;
     
     private Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
-
+    private Scanner input = new Scanner(System.in);
     public Board() {
     }
 
@@ -223,8 +224,8 @@ public class Board {
         }
         if (hasPiece(color*7, 0) && getPos(color*7, 0).getType().equals("Rook") && !getPos(color*7, 0).hasMoved() ||
                 hasPiece(color*7, 4) && getPos(color*7, 4).getType().equals("King") && !getPos(color*7, 4).hasMoved()) {
-                    movePiece(color*7, 4, color*7, 2);
-                    movePiece(color*7, 0, color*7, 3);
+                    movePiece(color*7, 4, color*7, 2, false);
+                    movePiece(color*7, 0, color*7, 3, false);
                     return true;
         }
         return false;
@@ -238,14 +239,14 @@ public class Board {
         }
         if (hasPiece(color*7, 7) && getPos(color*7, 7).getType().equals("Rook") && !getPos(color*7, 7).hasMoved() ||
                 hasPiece(color*7, 4) && getPos(color*7, 4).getType().equals("King") && !getPos(color*7, 4).hasMoved()) {
-                    movePiece(color*7, 4, color*7, 6);
-                    movePiece(color*7, 7, color*7, 5);
+                    movePiece(color*7, 4, color*7, 6, false);
+                    movePiece(color*7, 7, color*7, 5, false);
                     return true;
         }
         return false;
     }
 
-    public void movePiece(int x, int y, int targetx, int targety) {
+    public void movePiece(int x, int y, int targetx, int targety, boolean verbose) {
 
         if (hasPiece(x,y) && getPos(x,y).getType().equals("Pawn") && (x - targetx == 1 || x - targetx == -1)) { //if the pawn did en passent, remove the other pawn
             if (hasPiece(x,targety) && getPos(x, targety).enPassentPossible() && targety - y == 1) {
@@ -265,6 +266,20 @@ public class Board {
         
         if (getPos(x,y).getType().equals("Pawn") && (x - targetx == 2 || x - targetx == -2) && targety == y) { //enable en passent if a pawn moves two squares
             getPos(x, y).setPassent(true);
+        }
+
+        if (verbose && getPos(x,y).getType().equals("Pawn") && ((getPos(x,y).getColor() == 0 && targetx == 7) || (getPos(x,y).getColor() == 1 && targetx == 0))) {
+            System.out.println("Promote to Q,R,B, or N?");
+            String a = input.nextLine().toUpperCase();
+            if (a.equals("Q")) {
+                setPiece(x, y, new Queen(getPos(x,y).getColor()));
+            } else if (a.equals("R")) {
+                setPiece(x, y, new Rook(getPos(x,y).getColor()));
+            } else if (a.equals("B")) {
+                setPiece(x, y, new Bishop(getPos(x,y).getColor()));
+            } else if (a.equals("N")) {
+                setPiece(x, y, new Knight(getPos(x,y).getColor()));
+            }
         }
 
         
@@ -298,7 +313,7 @@ public class Board {
         setEqual(testboard, board);
         //if the piece can move, move it...
         if (canMove(x, y, targetx, targety, turn)) {
-            movePiece(x, y, targetx, targety);
+            movePiece(x, y, targetx, targety, false);
         } else {
             return false;
         }
