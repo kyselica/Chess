@@ -44,10 +44,16 @@ public class Piece {
         return false;
     }
 
+    public void setPassent(boolean x) {}
+
     public Piece makeCopy() {
         Piece output = new Piece(getColor());
         output.setX(getX());
         output.setY(getY());
         return output;
+    }
+
+    public boolean enPassentPossible() {
+        return false;
     }
 }

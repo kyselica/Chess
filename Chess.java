@@ -43,6 +43,8 @@ public class Chess {
             System.out.println(game);
             System.out.println(((turn == 1) ? "White" : "Black") + "\'s Turn! Enter cords of piece you want to move. (O-O or O-O-O to castle)");
             movepiecefrom = getCords();
+
+
             if (movepiecefrom[0] == 10 && movepiecefrom[1] == -1) {
                 if (!game.castleQueenside(turn)) {
                     System.out.println("That isnt a legal move!");

@@ -135,25 +135,7 @@ public class Board {
             }
             b++;
         }
-        /*
-        if (hasPiece(x + 2, y + 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        } else if (hasPiece(x + 2, y - 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        } else if (hasPiece(x - 2, y + 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        } else if (hasPiece(x - 2, y - 1) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        } else if (hasPiece(x + 1, y + 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        } else if (hasPiece(x + 1, y - 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        } else if (hasPiece(x - 1, y + 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        } else if (hasPiece(x - 1, y - 2) && getPos(x, y).getType().equals("Knight") && getPos(x, y).getColor() == color) {
-            return true;
-        }
-*/
+
         //check if there is a pawn in an attacking square. Have to take into account that different oclored pawns attack in different directions
         if (color == 1) {
             if (hasPiece(x-1, y+1) && getPos(x-1, y+1).getType().equals("Pawn") && getPos(x-1, y+1).getColor() == 1) {
@@ -220,6 +202,7 @@ public class Board {
             for (int y = 0; y < BOARD_SIZE; y++) {
                 //System.out.print(((isAttacked( 8-x, y, color)) ? "" : ""));
                 System.out.print(((isAttacked(x, y, color)) ? "X " : "- "));
+                //System.out.print(((hasPiece(x, y) && getPos(x, y).enPassentPossible()) ? "X " : "- "));
             }
             System.out.println();
         }
@@ -263,10 +246,37 @@ public class Board {
     }
 
     public void movePiece(int x, int y, int targetx, int targety) {
+
+        if (hasPiece(x,y) && getPos(x,y).getType().equals("Pawn") && (x - targetx == 1 || x - targetx == -1)) { //if the pawn did en passent, remove the other pawn
+            if (hasPiece(x,targety) && getPos(x, targety).enPassentPossible() && targety - y == 1) {
+                delPiece(x, targety);
+            } else if (hasPiece(x,y-1) && getPos(x, y-1).enPassentPossible() && targety - y == -1) {
+                delPiece(x, targety);
+            }
+        }
+
+        for (int a = 0; a < BOARD_SIZE; a++) { //after moving, disable en passant for all opposite colored pawns
+            for (int b = 0; b < BOARD_SIZE; b++) {
+                if (hasPiece(a, b) && getPos(a,b).getType().equals("Pawn") && getPos(a,b).getColor() == 1 - getPos(x, y).getColor()) {
+                   getPos(a, b).setPassent(false);
+                }
+            }
+        }
+        
+        if (getPos(x,y).getType().equals("Pawn") && (x - targetx == 2 || x - targetx == -2) && targety == y) { //enable en passent if a pawn moves two squares
+            getPos(x, y).setPassent(true);
+        }
+
+        
+
         setPiece(targetx, targety, getPos(x, y));
         getPos(x, y).setMoved(true);
         delPiece(x,y);
+
+        
     }
+
+
 
     public void setEqual(Piece[][] x, Piece[][] y) {
         for (int i =0; i < BOARD_SIZE;i++) {
